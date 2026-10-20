@@ -128,3 +128,21 @@ footer { border-top: 1px solid var(--line); }
 .hero .logo .mark { background: var(--on-brand); color: #820AD1; }
 .hero .nav-links a { color: rgba(255,255,255,.75); }
 .hero .nav-links a:hover, .hero .nav-links a.on { color: var(--on-brand); }
+
+/* Signature purple stays exact in light and dark mode */
+.hero { background: #820AD1; }
+
+/* Landing page: purple all the way down, white cards on top */
+body.landing { background: #820AD1; color: #FFFFFF; }
+.landing .section h2 { color: #FFFFFF; }
+.landing .section-head p { color: rgba(255,255,255,.75); }
+.landing .card { background: #FFFFFF; color: #111111; }
+.landing .card p { color: #5F5B66; }
+.landing .card .num, .landing .card .go { color: #820AD1; }
+.landing .tag { background: #F4EBFB; color: #6407A3; }
+.landing .pill.live { background: #820AD1; color: #FFFFFF; }
+.landing .pill.soon { background: #F4EBFB; color: #6407A3; }
+.landing a.card:hover { border-color: transparent; box-shadow: 0 12px 32px rgba(40,0,70,.35); }
+.landing footer { border-top: 1px solid rgba(255,255,255,.2); }
+.landing .footer-inner { color: rgba(255,255,255,.75); }
+.landing .footer-inner a { color: #FFFFFF; }
