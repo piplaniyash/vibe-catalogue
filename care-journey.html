@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Care Journey</title>
+<meta name="description" content="A clickable prototype of how a care navigator guides a family through cancer treatment. Fictional people and data.">
+<meta name="color-scheme" content="light only">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=4">
+<style>
+  .page { max-width: 960px; margin: 0 auto; padding: 40px 16px 72px; }
+  .eyebrow { font-size: 13px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: .08em; }
+  .page h1 { font-size: clamp(34px, 6.5vw, 52px); line-height: 1.05; letter-spacing: -0.04em; font-weight: 800; margin: 12px 0 14px; }
+  .lede { color: var(--muted); font-size: 18px; margin: 0; max-width: 640px; }
+  .notice { margin-top: 18px; display: inline-block; font-size: 13px; color: var(--muted); background: var(--surface); padding: 8px 14px; border-radius: 999px; }
+
+  /* Family picker */
+  .families { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 36px; }
+  .family {
+    text-align: left; font: inherit; color: inherit; cursor: pointer;
+    background: var(--bg); border: 2px solid var(--line); border-radius: var(--radius); padding: 20px 22px;
+    transition: border-color .15s;
+  }
+  .family:hover { border-color: var(--brand-tint); }
+  .family.on { border-color: var(--brand); background: var(--brand-tint); }
+  .family .who { font-weight: 800; font-size: 17px; letter-spacing: -0.01em; }
+  .family .ctx { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+  /* Stepper */
+  .stepper { display: flex; margin: 40px 0 0; overflow-x: auto; padding-bottom: 6px; }
+  .step {
+    flex: 1 0 110px; font: inherit; color: inherit; background: none; border: 0; cursor: pointer;
+    text-align: left; padding: 0 8px 0 0; position: relative;
+  }
+  .step::before { content: ""; position: absolute; left: 0; right: 0; top: 13px; height: 2px; background: var(--line); }
+  .step:last-child::before { width: 0; }
+  .step .n {
+    position: relative; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--bg); border: 2px solid var(--line); font-size: 13px; font-weight: 700; color: var(--muted);
+  }
+  .step.done .n { background: var(--brand-tint); border-color: var(--brand-tint); color: var(--brand); }
+  .step.on .n { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .step .t { display: block; margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .step.on .t { color: var(--ink); }
+
+  /* Stage panel */
+  .stage { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-top: 28px; }
+  .panel { background: var(--surface); border-radius: var(--radius); padding: 26px; }
+  .stage h2 { font-size: 26px; letter-spacing: -0.03em; margin: 0 0 6px; line-height: 1.15; }
+  .when { color: var(--brand); font-weight: 700; font-size: 13px; }
+  .block { margin-top: 20px; }
+  .block h4 { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .block p { margin: 0; font-size: 15px; }
+  .feeling { font-style: italic; }
+
+  .tasks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .tasks label {
+    display: flex; gap: 12px; align-items: flex-start; background: var(--bg); border-radius: 14px;
+    padding: 12px 14px; cursor: pointer; font-size: 15px;
+  }
+  .tasks input { accent-color: var(--brand); width: 18px; height: 18px; margin-top: 2px; flex: none; }
+  .tasks .done span { text-decoration: line-through; color: var(--muted); }
+  .owner { display: block; font-size: 12px; font-weight: 700; color: var(--brand); margin-top: 2px; text-decoration: none !important; }
+
+  .progress { height: 6px; border-radius: 6px; background: var(--line); margin-top: 14px; overflow: hidden; }
+  .progress div { height: 100%; background: var(--brand); border-radius: 6px; transition: width .25s; }
+  .ptext { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  /* WhatsApp-style chat */
+  .chat-head { display: flex; align-items: center; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-weight: 800; }
+  .chat-head b { display: block; font-size: 15px; }
+  .chat-head small { color: var(--muted); font-size: 12px; }
+  .chat { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .msg { max-width: 88%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.45; }
+  .msg.asha { background: var(--bg); border-top-left-radius: 4px; align-self: flex-start; }
+  .msg.fam { background: var(--brand-tint); border-top-right-radius: 4px; align-self: flex-end; }
+  .msg small { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* Tool: scheme finder / check-in */
+  .tool { margin-top: 20px; background: var(--bg); border-radius: 18px; padding: 18px; }
+  .tool h4 { margin: 0 0 10px; font-size: 15px; }
+  .q { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; font-size: 14px; border-bottom: 1px solid var(--line); }
+  .q:last-of-type { border-bottom: 0; }
+  .yn { display: flex; gap: 6px; }
+  .yn button { font: inherit; font-size: 13px; font-weight: 700; border: 1px solid var(--line); background: var(--bg); color: var(--muted); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+  .yn button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .result { margin-top: 12px; font-size: 14px; background: var(--brand-tint); border-radius: 12px; padding: 12px 14px; }
+  .result.alert { background: #FDECEC; color: #8A1C1C; }
+
+  .nav-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+  .nav-row .btn[disabled] { opacity: .35; cursor: default; transform: none; }
+
+  .model { margin-top: 56px; }
+  .model h2 { font-size: 24px; letter-spacing: -0.02em; margin: 0 0 16px; }
+  .pillars { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .pillars div { border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+  .pillars b { display: block; margin-bottom: 4px; }
+  .pillars span { color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="logo" href="index.html"><span class="mark">B</span>The Build Log</a>
+  <div class="nav-links">
+    <a href="index.html#builds">Builds</a>
+    <a href="quotes.html">Quotes</a>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="eyebrow">Prototype</div>
+  <h1>A care navigator for every family.</h1>
+  <p class="lede">Cancer care in India is fragmented across hospitals, pharmacies, insurers and schemes, and families carry the coordination. This prototype shows how a navigator on WhatsApp could carry it with them.</p>
+  <span class="notice">Fictional families and data. Not medical advice.</span>
+
+  <div class="families" id="families"></div>
+  <div class="stepper" id="stepper"></div>
+  <div class="stage" id="stage"></div>
+
+  <section class="model">
+    <h2>What the navigator does</h2>
+    <div class="pillars">
+      <div><b>One point of contact</b><span>A named navigator on WhatsApp, so the family never has to work out who to call.</span></div>
+      <div><b>Money first</b><span>Schemes, grants and insurance sorted early, because cost is what most often stops treatment.</span></div>
+      <div><b>Care at home</b><span>Medicine reminders, symptom check-ins and home visits between hospital trips.</span></div>
+      <div><b>Family in the loop</b><span>Updates for relatives in other cities or countries, without a dozen phone calls.</span></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span>The Build Log &middot; by Yash Piplani, built with Claude</span>
+    <a href="index.html">&larr; Back to all builds</a>
+  </div>
+</footer>
+
+<script>
+  // ALL PEOPLE, PLACES AND DATA BELOW ARE FICTIONAL.
+  // Each family has stages. Each stage has: what the family feels, what the navigator does,
+  // a checklist, a WhatsApp-style conversation, and optionally a small tool.
+  const families = [
+    {
+      id: "meera",
+      who: "The Sharma family",
+      ctx: "Meera, 52, newly diagnosed. Gurgaon.",
+      stages: [
+        {
+          title: "Diagnosis",
+          when: "Week 1",
+          feeling: "We have a report full of words we don't understand, and three people giving us different advice.",
+          navigator: "Explains the report in plain language, lists the questions to ask the oncologist, and books the first consult.",
+          tasks: [["Share biopsy report on WhatsApp", "Family"], ["Plain-language summary of the report", "Navigator"], ["First oncologist consult booked", "Navigator"], ["Questions list for the consult", "Navigator"]],
+          chat: [["fam", "We got the report. We don't know what any of this means."], ["nav", "I'm Asha, your care navigator. Send me a photo of the report and I'll explain it simply within the hour."], ["nav", "I've also booked Dr. Kapoor for Thursday 11am. I'll send the questions to ask before then."]]
+        },
+        {
+          title: "Second opinion",
+          when: "Week 2",
+          feeling: "Are we choosing the right hospital? Everyone says something different.",
+          navigator: "Arranges a second opinion, compares both treatment plans side by side, and lays out cost and travel for each.",
+          tasks: [["Second opinion booked", "Navigator"], ["Both plans compared in one page", "Navigator"], ["Family decides on hospital", "Family"]],
+          chat: [["nav", "Both doctors recommend a similar plan. The main differences are cost and travel time, here's a one-page comparison."], ["fam", "This helps a lot. We'll go with the closer hospital."]]
+        },
+        {
+          title: "Money and schemes",
+          when: "Week 2 to 3",
+          feeling: "We don't know how much this will cost, or whether we can afford all of it.",
+          navigator: "Estimates the full cost, checks which schemes and grants the family may qualify for, and helps with the paperwork.",
+          tasks: [["Treatment cost estimate shared", "Navigator"], ["Scheme eligibility checked", "Navigator"], ["Documents collected", "Family"], ["Applications submitted", "Navigator"]],
+          chat: [["fam", "The estimate is much more than our insurance covers."], ["nav", "Let's check what else you can use. Answer 3 quick questions in the scheme finder and I'll take it from there."]],
+          tool: "schemes"
+        },
+        {
+          title: "Starting treatment",
+          when: "Week 4",
+          feeling: "We're nervous about the first cycle and don't know what to expect at home afterwards.",
+          navigator: "Shares a simple day-by-day plan for the first cycle, what's normal, and the warning signs that need an urgent call.",
+          tasks: [["Cycle 1 date confirmed", "Navigator"], ["What-to-expect guide sent", "Navigator"], ["Hospital bag checklist", "Family"], ["Emergency contacts saved", "Family"]],
+          chat: [["nav", "Cycle 1 is confirmed for Monday 9am. I've sent a short guide on the first week at home."], ["nav", "Save this: if Meera has a fever, call the hospital's oncology line straight away, day or night."]]
+        },
+        {
+          title: "Between cycles",
+          when: "Weeks 5 to 16",
+          feeling: "The weeks between hospital visits feel like we're on our own.",
+          navigator: "Daily check-ins on WhatsApp, flags anything worrying to the care team, and arranges home visits when needed.",
+          tasks: [["Daily symptom check-in", "Family"], ["Weekly summary to the doctor", "Navigator"], ["Home nurse visit after cycle 2", "Navigator"]],
+          chat: [["nav", "Good morning! Quick check-in: how is Meera feeling today?"], ["fam", "Tired, and she didn't eat much yesterday."], ["nav", "Thanks for telling me. I've noted it for Dr. Kapoor and I'm sending tips on small, frequent meals."]],
+          tool: "checkin"
+        },
+        {
+          title: "Follow-up",
+          when: "Month 6 onwards",
+          feeling: "Treatment is done. Now what? We're scared of missing something.",
+          navigator: "Keeps a follow-up calendar, sends reminders for scans and visits, and stays the family's single point of contact.",
+          tasks: [["Follow-up calendar shared", "Navigator"], ["First review scan booked", "Navigator"], ["Records organised in one place", "Navigator"]],
+          chat: [["nav", "Meera's first review scan is in 3 weeks. I'll remind you 2 days before."], ["fam", "Thank you, Asha. We couldn't have done this alone."]]
+        }
+      ]
+    },
+    {
+      id: "rao",
+      who: "Arjun, abroad",
+      ctx: "Son in Toronto, father Mr. Rao, 68, in Lucknow.",
+      stages: [
+        {
+          title: "Far away",
+          when: "Week 1",
+          feeling: "I'm 11,000 km away, getting updates from relatives that don't add up.",
+          navigator: "Becomes the single source of truth: one group with the son, the mother and the navigator, with updates after every visit.",
+          tasks: [["Family WhatsApp group set up", "Navigator"], ["Consent to share updates", "Family"], ["Arjun added to all updates", "Navigator"]],
+          chat: [["fam", "My mother says one thing, my uncle says another. I just want to know what the doctor actually said."], ["nav", "From now on I'll post a summary in this group after every visit, in English and Hindi."]]
+        },
+        {
+          title: "Joining from abroad",
+          when: "Week 2",
+          feeling: "I want to be part of the big decisions, not hear about them later.",
+          navigator: "Schedules key consults at a time that works across both time zones and sets up a video link for Arjun.",
+          tasks: [["Consult at a time that suits Toronto", "Navigator"], ["Video link shared", "Navigator"], ["Arjun's questions sent to the doctor", "Family"]],
+          chat: [["nav", "I've booked the consult for 7:30pm IST, which is 10am in Toronto. Here's the video link."], ["fam", "Perfect. I'll send my questions tonight."]]
+        },
+        {
+          title: "Help at home",
+          when: "Weeks 3 to 12",
+          feeling: "My mother is managing everything alone. I can't be there.",
+          navigator: "Arranges home visits, medicine delivery and transport to the hospital, and checks in with Mrs. Rao every day.",
+          tasks: [["Medicine home delivery set up", "Navigator"], ["Cab booked for every hospital visit", "Navigator"], ["Weekly home nurse visit", "Navigator"]],
+          chat: [["nav", "Medicines for this month are delivered. The nurse visits every Friday, and I've booked cabs for both hospital trips."], ["fam", "This takes so much off my mother's plate."]]
+        },
+        {
+          title: "Paying from abroad",
+          when: "Ongoing",
+          feeling: "I want to pay for things directly and know where the money is going.",
+          navigator: "Shares every bill in one running ledger and sets up direct payments to the hospital and pharmacy.",
+          tasks: [["Running cost ledger shared", "Navigator"], ["Direct payment to the hospital", "Family"], ["Monthly cost summary", "Navigator"]],
+          chat: [["nav", "Here's this month's summary: hospital, medicines and home visits, with receipts attached."], ["fam", "Thank you. This is the first time I've seen it all in one place."]]
+        }
+      ]
+    },
+    {
+      id: "kumar",
+      who: "Mr. Kumar at home",
+      ctx: "Kumar, 61, on oral chemo tablets at home. Pune.",
+      stages: [
+        {
+          title: "Starting tablets",
+          when: "Day 1",
+          feeling: "Tablets at home sound easy, but the schedule is confusing and the side effects worry me.",
+          navigator: "Turns the prescription into a simple daily schedule and explains which side effects are normal and which need a call.",
+          tasks: [["Prescription turned into a daily schedule", "Navigator"], ["Reminder times agreed", "Family"], ["Warning signs explained", "Navigator"]],
+          chat: [["nav", "Here's your schedule as a simple chart: when to take each tablet and with or without food."], ["fam", "Much clearer than the prescription, thank you."]]
+        },
+        {
+          title: "Daily reminders",
+          when: "Every day",
+          feeling: "Some days I forget, and I don't know what to do if I miss a dose.",
+          navigator: "Sends a reminder at each dose time and a one-tap 'taken' reply. Missed doses are flagged so the care team can advise.",
+          tasks: [["Morning reminder", "Navigator"], ["Evening reminder", "Navigator"], ["Missed doses flagged to the care team", "Navigator"]],
+          chat: [["nav", "Time for your 8pm tablet. Reply 1 when you've taken it."], ["fam", "1"], ["nav", "Got it, thank you. That's 6 days in a row."]],
+          tool: "checkin"
+        },
+        {
+          title: "Refills",
+          when: "Every 4 weeks",
+          feeling: "Last month we ran out for two days because the pharmacy didn't have stock.",
+          navigator: "Tracks how many tablets are left, orders refills early, and finds another pharmacy if stock runs short.",
+          tasks: [["Tablet count tracked", "Navigator"], ["Refill ordered 7 days early", "Navigator"], ["Backup pharmacy identified", "Navigator"]],
+          chat: [["nav", "You have about 7 days left, so I've ordered the refill. It arrives Wednesday."], ["fam", "Great, no more last-minute running around."]]
+        },
+        {
+          title: "Doctor review",
+          when: "Monthly",
+          feeling: "I only see the doctor for ten minutes, and I forget half of what happened this month.",
+          navigator: "Sends the doctor a one-page summary before each review: doses taken, missed doses and symptoms reported.",
+          tasks: [["Monthly summary sent to the doctor", "Navigator"], ["Questions for the review", "Family"], ["Review notes shared back", "Navigator"]],
+          chat: [["nav", "I've sent Dr. Iyer this month's summary: 27 of 28 days taken, mild tiredness in week 2."], ["fam", "That makes the appointment so much easier."]]
+        }
+      ]
+    }
+  ];
+
+  const $ = id => document.getElementById(id);
+  let fam = families[0], stageIndex = 0;
+  const ticked = {};               // remembers ticked tasks while the page is open
+  const toolState = {};
+
+  function renderFamilies() {
+    $("families").innerHTML = families.map(f => `
+      <button class="family ${f.id === fam.id ? "on" : ""}" data-id="${f.id}">
+        <div class="who">${f.who}</div><div class="ctx">${f.ctx}</div>
+      </button>`).join("");
+    document.querySelectorAll(".family").forEach(b => b.onclick = () => {
+      fam = families.find(f => f.id === b.dataset.id); stageIndex = 0; render();
+    });
+  }
+
+  function key(i) { return fam.id + "-" + i; }
+  function stageDone(i) {
+    const t = ticked[key(i)] || [];
+    return fam.stages[i].tasks.length && t.filter(Boolean).length === fam.stages[i].tasks.length;
+  }
+
+  function renderStepper() {
+    $("stepper").innerHTML = fam.stages.map((s, i) => `
+      <button class="step ${i === stageIndex ? "on" : ""} ${stageDone(i) ? "done" : ""}" data-i="${i}">
+        <span class="n">${stageDone(i) && i !== stageIndex ? "&#10003;" : i + 1}</span><span class="t">${s.title}</span>
+      </button>`).join("");
+    document.querySelectorAll(".step").forEach(b => b.onclick = () => { stageIndex = +b.dataset.i; render(); });
+  }
+
+  function tool(type) {
+    const st = toolState[type] || (toolState[type] = {});
+    const yn = (k, label) => `
+      <div class="q"><span>${label}</span><span class="yn">
+        <button class="${st[k] === true ? "on" : ""}" data-k="${k}" data-v="1">Yes</button>
+        <button class="${st[k] === false ? "on" : ""}" data-k="${k}" data-v="0">No</button></span></div>`;
+    if (type === "schemes") {
+      let out = "";
+      if (Object.keys(st).length === 3) {
+        const ideas = [];
+        if (st.card || st.age) ideas.push("Ayushman Bharat PM-JAY");
+        ideas.push("your state's health scheme");
+        if (st.low) ideas.push("NGO and hospital grants for treatment costs");
+        out = `<div class="result"><b>Worth checking:</b> ${ideas.join(", ")}. The navigator confirms eligibility and handles the forms.</div>`;
+      }
+      return `<div class="tool"><h4>Scheme finder (demo)</h4>
+        ${yn("card", "Does the family have an Ayushman card or ration card?")}
+        ${yn("age", "Is the patient aged 70 or above?")}
+        ${yn("low", "Would treatment costs strain the family's savings?")}
+        ${out}</div>`;
+    }
+    if (type === "checkin") {
+      let out = "";
+      if (st.fever === true) out = `<div class="result alert"><b>Call the oncology team now.</b> A fever during cancer treatment needs urgent medical attention.</div>`;
+      else if (Object.keys(st).length === 3) out = `<div class="result">${st.eat === false || st.dose === false ? "Noted. The navigator will follow up today and share it with the care team." : "All good today. See you at tomorrow's check-in."}</div>`;
+      return `<div class="tool"><h4>Today's check-in (demo)</h4>
+        ${yn("fever", "Any fever today?")}
+        ${yn("eat", "Eating reasonably well?")}
+        ${yn("dose", "Taken today's medicines?")}
+        ${out}</div>`;
+    }
+    return "";
+  }
+
+  function renderStage() {
+    const s = fam.stages[stageIndex], k = key(stageIndex);
+    const t = ticked[k] || (ticked[k] = s.tasks.map(() => false));
+    const done = t.filter(Boolean).length;
+    $("stage").innerHTML = `
+      <div class="panel">
+        <div class="when">Stage ${stageIndex + 1} of ${fam.stages.length} &middot; ${s.when}</div>
+        <h2>${s.title}</h2>
+        <div class="block"><h4>What the family feels</h4><p class="feeling">&ldquo;${s.feeling}&rdquo;</p></div>
+        <div class="block"><h4>What the navigator does</h4><p>${s.navigator}</p></div>
+        <div class="block"><h4>Checklist</h4>
+          <ul class="tasks">${s.tasks.map(([task, owner], i) => `
+            <li><label class="${t[i] ? "done" : ""}"><input type="checkbox" data-i="${i}" ${t[i] ? "checked" : ""}>
+              <span>${task}<span class="owner">${owner}</span></span></label></li>`).join("")}</ul>
+          <div class="progress"><div style="width:${(done / s.tasks.length) * 100}%"></div></div>
+          <div class="ptext">${done} of ${s.tasks.length} done</div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-soft" id="prev" ${stageIndex === 0 ? "disabled" : ""}>&larr; Back</button>
+          <button class="btn btn-brand" id="next" ${stageIndex === fam.stages.length - 1 ? "disabled" : ""}>Next stage &rarr;</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="chat-head"><span class="avatar">A</span><div><b>Asha, care navigator</b><small>WhatsApp &middot; usually replies within the hour</small></div></div>
+        <div class="chat">${s.chat.map(([from, text]) => `<div class="msg ${from === "nav" ? "asha" : "fam"}">${text}<small>${from === "nav" ? "Asha" : "Family"}</small></div>`).join("")}</div>
+        ${s.tool ? tool(s.tool) : ""}
+      </div>`;
+
+    document.querySelectorAll(".tasks input").forEach(cb => cb.onchange = () => {
+      t[+cb.dataset.i] = cb.checked; renderStepper(); renderStage();
+    });
+    document.querySelectorAll(".yn button").forEach(b => b.onclick = () => {
+      toolState[s.tool][b.dataset.k] = b.dataset.v === "1"; renderStage();
+    });
+    $("prev").onclick = () => { if (stageIndex > 0) { stageIndex--; render(); } };
+    $("next").onclick = () => { if (stageIndex < fam.stages.length - 1) { stageIndex++; render(); } };
+  }
+
+  function render() { renderFamilies(); renderStepper(); renderStage(); }
+  render();
+</script>
+</body>
+</html>
