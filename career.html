@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Career Timeline</title>
+<meta name="description" content="Eighteen years in product across automotive, travel, food delivery, fintech and retail data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .hero-inner.compact { padding: 40px 16px 64px; }
+  .hero .stats { margin-top: 36px; flex-wrap: wrap; row-gap: 20px; }
+
+  /* Journey strip */
+  .journey {
+    background: var(--brand-tint); border-radius: var(--radius); padding: 28px;
+    margin-top: -36px; position: relative;
+  }
+  .label { font-size: 13px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: .06em; }
+  .stops { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+  .stop { background: var(--bg); border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 14px; }
+  .stop small { font-weight: 600; color: var(--muted); margin-left: 6px; }
+  .arrow { color: var(--brand); font-weight: 800; }
+  .thread { margin: 18px 0 0; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+
+  /* Filters */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 40px 0 28px; }
+  .chip {
+    font: inherit; font-size: 14px; font-weight: 600; padding: 8px 16px; border-radius: 999px;
+    cursor: pointer; border: 0; background: var(--surface); color: var(--ink);
+  }
+  .chip.on { background: var(--brand); color: var(--on-brand); }
+  .filters .spacer { flex: 1; }
+  .toggle { font: inherit; font-size: 14px; font-weight: 700; background: none; border: 0; color: var(--brand); cursor: pointer; padding: 8px 0; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 34px; }
+  .timeline::before {
+    content: ""; position: absolute; left: 9px; top: 8px; bottom: 8px;
+    width: 3px; border-radius: 3px; background: var(--brand-tint);
+  }
+  .role { position: relative; margin-bottom: 16px; transition: opacity .2s; }
+  .role.dim { opacity: .3; }
+  .dot {
+    position: absolute; left: -34px; top: 28px; width: 21px; height: 21px; border-radius: 50%;
+    background: var(--bg); border: 4px solid var(--brand);
+  }
+  .role.now .dot { background: var(--brand); box-shadow: 0 0 0 6px var(--brand-tint); }
+  .role-card {
+    background: var(--surface); border-radius: var(--radius); padding: 24px 26px;
+    cursor: pointer; border: 2px solid transparent; transition: border-color .15s;
+  }
+  .role-card:hover { border-color: var(--brand-tint); }
+  .role.open .role-card { border-color: var(--brand); }
+  .when { font-size: 13px; font-weight: 700; color: var(--brand); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .now-pill { background: var(--brand); color: var(--on-brand); border-radius: 999px; padding: 2px 10px; font-size: 12px; }
+  .role h3 { margin: 8px 0 2px; font-size: 22px; letter-spacing: -0.02em; line-height: 1.2; }
+  .title { font-weight: 600; margin: 0; }
+  .where { color: var(--muted); font-size: 14px; margin: 4px 0 0; }
+  .summary { color: var(--muted); margin: 12px 0 0; font-size: 15px; }
+  .wins { display: none; margin: 16px 0 0; padding: 0; list-style: none; gap: 10px; }
+  .role.open .wins { display: grid; }
+  .wins li { background: var(--bg); border-radius: 14px; padding: 12px 16px; font-size: 15px; }
+  .wins b { color: var(--brand); }
+  .card-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .more { font-size: 14px; font-weight: 700; color: var(--brand); }
+
+  /* Education */
+  .edu { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-top: 20px; }
+  .edu div { background: var(--surface); border-radius: var(--radius); padding: 22px 24px; }
+  .edu b { display: block; font-size: 17px; }
+  .edu span { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <nav class="nav">
+    <a class="logo" href="index.html"><span class="mark">B</span>The Build Log</a>
+    <div class="nav-links">
+      <a href="index.html#builds">Builds</a>
+      <a href="quotes.html">Quotes</a>
+    </div>
+  </nav>
+  <div class="hero-inner compact">
+    <h1>Eighteen years of building platforms.</h1>
+    <p>From dealer databases to identity for 90M+ customers. Tap any role to see what changed while I was there.</p>
+    <div class="stats">
+      <div><b>18+</b><span>years in tech and product</span></div>
+      <div><b>7</b><span>companies</span></div>
+      <div><b>5</b><span>countries</span></div>
+      <div><b>90M+</b><span>users served at peak</span></div>
+    </div>
+  </div>
+</div>
+
+<main class="section" style="padding-top:0">
+  <section class="journey">
+    <div class="label">The journey</div>
+    <div class="stops" id="stops"></div>
+    <p class="thread">The throughline: taking fragmented systems and turning them into platforms that whole companies build on.</p>
+  </section>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="timeline" id="timeline"></div>
+
+  <h2 style="margin-top:56px">Education</h2>
+  <div class="edu">
+    <div><b>MBA, Finance</b><span>California State University, Los Angeles, USA &middot; 2008</span></div>
+    <div><b>B.Tech, Electronics &amp; Instrumentation</b><span>UPTU, Greater Noida, India &middot; 2006</span></div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span>The Build Log &middot; by Yash Piplani, built with Claude</span>
+    <a href="index.html">&larr; Back to all builds</a>
+  </div>
+</footer>
+
+<script>
+  // EDIT YOUR CAREER HERE. Newest role first.
+  // themes decide which filter buttons highlight a role.
+  const roles = [
+    {
+      company: "dunnhumby",
+      title: "Global Director of Product, Platforms",
+      when: "Jul 2024 to Present",
+      where: "Gurgaon, India",
+      now: true,
+      summary: "Own the product portfolio for dunnhumby's data orchestration ecosystem, the ML and analytics backbone behind retail insights for global retailers and CPG brands.",
+      wins: [
+        ["Minutes to under 60 seconds", "query latency, enabling premium client SLA tiers"],
+        ["3x faster", "model shipping for data science teams, via an org-wide ML deployment standard"],
+        ["20+ people upskilled", "through the Product & Platform Academy I founded"]
+      ],
+      themes: ["Data platforms", "AI & ML", "Leadership"]
+    },
+    {
+      company: "Nubank",
+      title: "Director of Product (Tech), Customer Identity & Data Platforms",
+      when: "Jan 2022 to Apr 2024",
+      where: "Berlin, Germany",
+      summary: "Single-threaded owner of Nubank's customer identity platform, serving 90M+ customers across 15+ business units and multiple countries.",
+      wins: [
+        ["$200M", "projected GMV opportunity, from a cross-business partnership enabling non-customer login"],
+        ["24+ months to 6", "credit card launch cycle, through reusable identity capabilities"],
+        ["20+ person org", "of PMs and engineers, with hiring frameworks and career ladders"],
+        ["20% to 45%", "underrepresented talent in product roles, via a global hiring initiative I co-led"]
+      ],
+      themes: ["Identity", "Leadership"]
+    },
+    {
+      company: "Glovo",
+      title: "Head of Product Operations",
+      when: "May 2021 to Jan 2022",
+      where: "Barcelona, Spain",
+      summary: "Led product execution and platform integration for Glovo's multi-category marketplace, including integrating FoodPanda's European operations.",
+      wins: [
+        ["6+ months to 4 to 6 weeks", "post-acquisition integration time, via standardized migration tooling"],
+        ["~500K", "customers and partners onboarded from Eastern European brands"],
+        ["Company-wide", "OKR, PRD and press-release frameworks for product execution"]
+      ],
+      themes: ["Data platforms", "Leadership"]
+    },
+    {
+      company: "Booking Holdings",
+      title: "Head of Technical Capabilities",
+      when: "Dec 2019 to May 2021",
+      where: "Amsterdam, Netherlands",
+      summary: "Led horizontal identity and order data platforms supporting 50M+ monthly orders across all Booking Holdings brands.",
+      wins: [
+        ["Source of truth", "for order data, enabling the flagship Connected Trip strategy"],
+        ["12% to 30%", "identifiable traveler requests on web, via passwordless sign-in"],
+        ["10M+", "historical reservation events synchronized across platforms"]
+      ],
+      themes: ["Identity", "Data platforms", "Growth & conversion"]
+    },
+    {
+      company: "Expedia Group",
+      title: "Senior Technical Product Manager",
+      when: "Feb 2016 to Dec 2019",
+      where: "Gurgaon, India",
+      summary: "Owned mobile and web checkout across Hotels, Flights and Activities, driving conversion and a global modernization program.",
+      wins: [
+        ["10%+", "conversion uplift from mobile checkout redesign and experimentation"],
+        ["~$9M", "revenue opportunity from cutting checkout validation errors by 10%"],
+        ["India lead", "for the Mobile Everywhere modernization program"]
+      ],
+      themes: ["Growth & conversion"]
+    },
+    {
+      company: "Ford Motor Company",
+      title: "Product Owner, Global Unified Dealer Database",
+      when: "Nov 2012 to Jan 2016",
+      where: "Gurgaon, India",
+      summary: "Owned the enterprise platform powering marketing analytics and dealer operations globally.",
+      wins: [
+        ["2M+", "customer and vehicle maintenance records onboarded from the China joint venture"]
+      ],
+      themes: ["Data platforms"]
+    },
+    {
+      company: "Earlier career",
+      title: "Business Analyst",
+      when: "2007 to 2012",
+      where: "Royal Bank of Scotland, Sun Life Financial and consulting firms",
+      summary: "Credit risk systems, financial data platforms and enterprise workflow automation. Where I learned how big systems really work.",
+      wins: [],
+      themes: ["Data platforms"]
+    }
+  ];
+
+  // Where I've lived and worked, in order.
+  const journey = [
+    ["India", "Start"], ["USA", "MBA"], ["India", "Ford, Expedia"],
+    ["Netherlands", "Booking"], ["Spain", "Glovo"], ["Germany", "Nubank"], ["India", "dunnhumby"]
+  ];
+
+  const $ = id => document.getElementById(id);
+  let theme = "All", allOpen = false;
+
+  $("stops").innerHTML = journey.map(([c, n], i) =>
+    `${i ? '<span class="arrow">&rarr;</span>' : ""}<span class="stop">${c}<small>${n}</small></span>`).join("");
+
+  function filters() {
+    const themes = ["All", ...new Set(roles.flatMap(r => r.themes))];
+    $("filters").innerHTML = themes.map(t =>
+      `<button class="chip ${t === theme ? "on" : ""}" data-t="${t}">${t}</button>`).join("") +
+      `<span class="spacer"></span><button class="toggle" id="toggle">${allOpen ? "Collapse all" : "Expand all"}</button>`;
+    $("filters").querySelectorAll(".chip").forEach(c => c.onclick = () => { theme = c.dataset.t; filters(); dim(); });
+    $("toggle").onclick = () => {
+      allOpen = !allOpen;
+      document.querySelectorAll(".role").forEach(r => {
+        if (r.dataset.wins == 0) return;
+        r.classList.toggle("open", allOpen);
+        r.querySelector(".more").textContent = allOpen ? "Hide highlights" : "Highlights +";
+      });
+      filters();
+    };
+  }
+
+  function dim() {
+    document.querySelectorAll(".role").forEach((el, i) =>
+      el.classList.toggle("dim", theme !== "All" && !roles[i].themes.includes(theme)));
+  }
+
+  $("timeline").innerHTML = roles.map(r => `
+    <article class="role ${r.now ? "now" : ""}" data-wins="${r.wins.length}">
+      <span class="dot"></span>
+      <div class="role-card">
+        <div class="when">${r.when}${r.now ? '<span class="now-pill">Now</span>' : ""}</div>
+        <h3>${r.company}</h3>
+        <p class="title">${r.title}</p>
+        <p class="where">${r.where}</p>
+        <p class="summary">${r.summary}</p>
+        <ul class="wins">${r.wins.map(([b, t]) => `<li><b>${b}</b> ${t}</li>`).join("")}</ul>
+        <div class="card-foot">
+          <div class="tags">${r.themes.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+          ${r.wins.length ? `<span class="more">Highlights +</span>` : ""}
+        </div>
+      </div>
+    </article>`).join("");
+
+  document.querySelectorAll(".role").forEach(el => {
+    if (el.dataset.wins == 0) return;
+    el.querySelector(".role-card").onclick = () => {
+      el.classList.toggle("open");
+      el.querySelector(".more").textContent = el.classList.contains("open") ? "Hide highlights" : "Highlights +";
+    };
+  });
+
+  // Open the current role by default so visitors see what a highlight looks like.
+  const first = document.querySelector(".role.now");
+  if (first) { first.classList.add("open"); first.querySelector(".more").textContent = "Hide highlights"; }
+
+  filters();
+</script>
+</body>
+</html>
