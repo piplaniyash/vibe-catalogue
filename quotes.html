@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quotes I Live By</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --card: #ffffff;
+    --ink: #1c1b19;
+    --muted: #6b675f;
+    --line: #e4e0d6;
+    --accent: #c2410c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151412;
+      --card: #1f1d1a;
+      --ink: #f2efe8;
+      --muted: #a39e93;
+      --line: #34312b;
+      --accent: #fb923c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; line-height: 1.55; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 16px; }
+  .back { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; }
+  h1 { font-family: Fraunces, Georgia, serif; font-size: clamp(30px, 6vw, 46px); margin: 18px 0 8px; line-height: 1.1; }
+  .intro { color: var(--muted); margin: 0 0 28px; }
+
+  .spotlight {
+    background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    border-radius: 14px; padding: 28px; margin-bottom: 28px;
+  }
+  .spotlight .label { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .spotlight blockquote { font-family: Fraunces, Georgia, serif; font-style: italic; font-size: clamp(20px, 3.5vw, 26px); margin: 12px 0; line-height: 1.35; }
+  .spotlight .who { color: var(--muted); font-size: 15px; }
+  button {
+    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 14px; margin-top: 14px;
+  }
+
+  .controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  input[type=search] {
+    font: inherit; width: 100%; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-size: 13px; padding: 5px 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink); margin: 0; font-weight: 500;
+  }
+  .chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .list { display: grid; gap: 14px; }
+  .quote { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  .quote p { font-family: Fraunces, Georgia, serif; font-size: 19px; margin: 0 0 10px; }
+  .meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .who { color: var(--muted); font-size: 14px; }
+  .copy { background: transparent; color: var(--accent); border: 1px solid var(--line); margin: 0; padding: 4px 10px; font-size: 13px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tag { font-size: 12px; border: 1px solid var(--line); padding: 2px 8px; border-radius: 6px; color: var(--muted); }
+  .empty { color: var(--muted); text-align: center; padding: 40px 0; }
+  .count { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">&larr; Back to catalogue</a>
+  <h1>Quotes I Live By</h1>
+  <p class="intro">Ideas on wealth, wisdom and life that I keep coming back to. Every quote here is hand-picked.</p>
+
+  <section class="spotlight" id="spotlight"></section>
+
+  <div class="controls">
+    <input type="search" id="search" placeholder="Search quotes or authors...">
+    <div class="chips" id="chips"></div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+  // ADD YOUR QUOTES HERE.
+  // Copy one block, paste it below the last one, and change the text, author, source and tags.
+  // Keep the quote text inside the double quotes. Each block ends with a comma.
+  const quotes = [
+    {
+      text: "Replace this with your first Naval Ravikant quote.",
+      author: "Naval Ravikant",
+      source: "The Almanack of Naval Ravikant",
+      tags: ["Wealth"]
+    },
+    {
+      text: "Replace this with your first quote from The Psychology of Money.",
+      author: "Morgan Housel",
+      source: "The Psychology of Money",
+      tags: ["Money", "Behaviour"]
+    },
+  ];
+
+  let activeAuthor = "All";
+  const $ = id => document.getElementById(id);
+
+  function spotlight() {
+    if (!quotes.length) { $("spotlight").style.display = "none"; return; }
+    const q = quotes[Math.floor(Math.random() * quotes.length)];
+    $("spotlight").innerHTML = `
+      <div class="label">Today's pick</div>
+      <blockquote>&ldquo;${q.text}&rdquo;</blockquote>
+      <div class="who">${q.author}${q.source ? ", " + q.source : ""}</div>
+      <button onclick="spotlight()">Show another</button>`;
+  }
+
+  function chips() {
+    const authors = ["All", ...new Set(quotes.map(q => q.author))];
+    $("chips").innerHTML = authors.map(a =>
+      `<button class="chip ${a === activeAuthor ? "on" : ""}" data-a="${a}">${a}</button>`).join("");
+    $("chips").querySelectorAll(".chip").forEach(c =>
+      c.onclick = () => { activeAuthor = c.dataset.a; chips(); render(); });
+  }
+
+  function render() {
+    const term = $("search").value.toLowerCase();
+    const shown = quotes.filter(q =>
+      (activeAuthor === "All" || q.author === activeAuthor) &&
+      (q.text + q.author + (q.source || "") + q.tags.join(" ")).toLowerCase().includes(term));
+    $("count").textContent = `${shown.length} of ${quotes.length} quotes`;
+    $("list").innerHTML = shown.length ? shown.map((q, i) => `
+      <article class="quote">
+        <p>&ldquo;${q.text}&rdquo;</p>
+        <div class="meta">
+          <span class="who">${q.author}${q.source ? ", " + q.source : ""}</span>
+          <button class="copy" data-i="${quotes.indexOf(q)}">Copy</button>
+        </div>
+        <div class="tags">${q.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+      </article>`).join("") : `<div class="empty">No quotes match that search.</div>`;
+    $("list").querySelectorAll(".copy").forEach(b => b.onclick = () => {
+      const q = quotes[b.dataset.i];
+      navigator.clipboard.writeText(`"${q.text}" (${q.author})`).then(() => {
+        b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1200);
+      }).catch(() => {});
+    });
+  }
+
+  $("search").oninput = render;
+  spotlight(); chips(); render();
+</script>
+</body>
+</html>

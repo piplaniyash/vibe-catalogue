@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yash's Vibe Coding Catalogue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --card: #ffffff;
+    --ink: #1c1b19;
+    --muted: #6b675f;
+    --line: #e4e0d6;
+    --accent: #c2410c;
+    --live: #15803d;
+    --soon: #a16207;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151412;
+      --card: #1f1d1a;
+      --ink: #f2efe8;
+      --muted: #a39e93;
+      --line: #34312b;
+      --accent: #fb923c;
+      --live: #4ade80;
+      --soon: #facc15;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Inter, system-ui, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 56px 16px 40px; }
+  header { margin-bottom: 40px; }
+  .eyebrow {
+    font-size: 13px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  h1 {
+    font-family: Fraunces, Georgia, serif;
+    font-size: clamp(32px, 6vw, 52px);
+    line-height: 1.1; margin: 10px 0 14px;
+  }
+  .intro { color: var(--muted); max-width: 620px; font-size: 17px; margin: 0; }
+  .stats { display: flex; gap: 24px; margin-top: 24px; font-size: 14px; color: var(--muted); }
+  .stats b { color: var(--ink); font-size: 20px; display: block; }
+  .grid {
+    display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 20px;
+    display: flex; flex-direction: column; gap: 10px;
+    transition: transform .15s, border-color .15s;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .num { font-family: Fraunces, Georgia, serif; font-size: 22px; color: var(--muted); }
+  .status { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; border: 1px solid currentColor; }
+  .status.live { color: var(--live); }
+  .status.soon { color: var(--soon); }
+  .card h2 { font-size: 18px; margin: 0; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 12px; background: var(--bg); border: 1px solid var(--line); padding: 2px 8px; border-radius: 6px; }
+  .card a {
+    color: var(--accent); font-weight: 600; text-decoration: none; font-size: 15px;
+  }
+  .card a:hover { text-decoration: underline; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 20px; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">A product leader learns to build</div>
+    <h1>Vibe Coding Catalogue</h1>
+    <p class="intro">Small, working products built with AI, by a product leader who had never written code. Each one starts with a real problem, ships fast, and gets better with feedback.</p>
+    <div class="stats">
+      <div><b id="total">0</b>projects</div>
+      <div><b id="live">0</b>live</div>
+    </div>
+  </header>
+
+  <main class="grid" id="grid"></main>
+
+  <footer>
+    Built by Yash Piplani with Claude &middot;
+    <a href="https://github.com/piplaniyash/vibe-coding-catalogue">View the code on GitHub</a>
+  </footer>
+</div>
+
+<script>
+  // ADD OR UPDATE PROJECTS HERE.
+  // When a project goes live, change status to "live" and set link to its file name.
+  const projects = [
+    {
+      title: "Quotes I Live By",
+      description: "A personal collection of quotes on wealth, wisdom and life, hand-picked by me. Search, filter and shuffle.",
+      tags: ["Curation", "Search"],
+      status: "live",
+      link: "quotes.html"
+    },
+    {
+      title: "Bollywood Decade Mixer",
+      description: "Browse Bollywood and Punjabi tracks from the 80s to the 2020s and find BPM-matched pairings for smooth transitions.",
+      tags: ["Music", "DJing"],
+      status: "soon",
+      link: ""
+    },
+    {
+      title: "Vastu Room Guide",
+      description: "An interactive floor plan showing the eight direction zones and what each one is traditionally suited for.",
+      tags: ["Home", "Interactive"],
+      status: "soon",
+      link: ""
+    },
+    {
+      title: "Bedtime Story Picker",
+      description: "Spin the wheels to pick a hero, a place and a twist for tonight's story.",
+      tags: ["Kids", "Fun"],
+      status: "soon",
+      link: ""
+    },
+    {
+      title: "Product Teardown Template",
+      description: "A guided form that turns any app into a structured teardown: users, problem, value, growth loops and risks.",
+      tags: ["Product", "Framework"],
+      status: "soon",
+      link: ""
+    },
+    {
+      title: "Career Timeline",
+      description: "Eighteen years in product, from travel to fintech to retail data, as an interactive timeline.",
+      tags: ["Career", "Storytelling"],
+      status: "soon",
+      link: ""
+    },
+    {
+      title: "Care Journey Prototype",
+      description: "A clickable walkthrough of a family's next steps after a cancer diagnosis. Dummy data only.",
+      tags: ["Prototype", "Healthcare"],
+      status: "soon",
+      link: ""
+    }
+  ];
+
+  const grid = document.getElementById("grid");
+  projects.forEach((p, i) => {
+    const live = p.status === "live";
+    const card = document.createElement("article");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="top">
+        <span class="num">${String(i + 1).padStart(2, "0")}</span>
+        <span class="status ${live ? "live" : "soon"}">${live ? "Live" : "Coming soon"}</span>
+      </div>
+      <h2>${p.title}</h2>
+      <p>${p.description}</p>
+      <div class="tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+      ${live && p.link ? `<a href="${p.link}">Open project &rarr;</a>` : ""}
+    `;
+    grid.appendChild(card);
+  });
+  document.getElementById("total").textContent = projects.length;
+  document.getElementById("live").textContent = projects.filter(p => p.status === "live").length;
+</script>
+</body>
+</html>
