@@ -2,6 +2,7 @@
    One brand colour (#820AD1) plus neutrals. Change --brand to rebrand the whole site. */
 
 :root {
+  color-scheme: light only;
   --brand: #820AD1;
   --brand-dark: #6407A3;
   --brand-tint: #F4EBFB;
