@@ -13,18 +13,6 @@
   --on-brand: #FFFFFF;
   --radius: 24px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --brand: #A64DF0;
-    --brand-dark: #B86BF3;
-    --brand-tint: #2A1638;
-    --bg: #0F0D12;
-    --surface: #1A1720;
-    --ink: #F5F3F7;
-    --muted: #A9A3B2;
-    --line: #2B2733;
-  }
-}
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }

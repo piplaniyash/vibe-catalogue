@@ -18,7 +18,30 @@
   .facts b { display: block; font-size: 26px; letter-spacing: -0.03em; line-height: 1.1; }
   .facts span { color: var(--muted); font-size: 13px; }
 
-  .roles { margin-top: 24px; }
+  /* Journey */
+  .journey { margin-top: 40px; }
+  .section-label { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin: 0 0 18px; }
+  .route { display: flex; align-items: flex-start; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+  .stop { flex: 1 0 96px; position: relative; text-align: left; background: none; border: 0; font: inherit; color: inherit; cursor: pointer; padding: 0 8px 0 0; }
+  .stop::before { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 2px; background: var(--line); }
+  .stop:last-child::before { right: auto; width: 0; }
+  .stop .pin { position: relative; display: block; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 3px solid var(--brand); transition: transform .15s; }
+  .stop:hover .pin, .stop.on .pin { background: var(--brand); transform: scale(1.15); }
+  .stop .country { display: block; margin-top: 10px; font-weight: 700; font-size: 15px; }
+  .stop .what { display: block; color: var(--muted); font-size: 13px; }
+  .stop .cont { display: block; color: var(--brand); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+  .hint { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
+
+  /* Filters */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 44px 0 4px; }
+  .chip { font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; border-radius: 999px; cursor: pointer; border: 1px solid var(--line); background: var(--bg); color: var(--muted); }
+  .chip:hover { color: var(--ink); }
+  .chip.on { background: var(--brand-tint); border-color: var(--brand-tint); color: var(--brand); }
+
+  .roles { margin-top: 8px; }
+  .role { transition: opacity .2s, background .4s; scroll-margin-top: 24px; }
+  .role.dim { opacity: .3; }
+  .role.flash { background: var(--brand-tint); }
   .role { display: grid; grid-template-columns: 120px 1fr; gap: 20px; padding: 28px 0; border-bottom: 1px solid var(--line); }
   .years { color: var(--muted); font-size: 14px; font-weight: 600; padding-top: 4px; }
   .role.now .years { color: var(--brand); }
@@ -64,11 +87,18 @@
     <div><b>90M+</b><span>users served</span></div>
   </div>
 
+  <section class="journey">
+    <p class="section-label">The journey</p>
+    <div class="route" id="route"></div>
+    <p class="hint">Tap a stop to jump to that chapter. On a phone, swipe to see the full route.</p>
+  </section>
+
+  <div class="filters" id="filters"></div>
   <div class="roles" id="roles"></div>
 
   <h2>Education</h2>
   <div class="edu">
-    <div class="role"><div class="years">2008</div><div><h3>MBA, Finance</h3><p class="where">California State University, Los Angeles, USA</p></div></div>
+    <div class="role" id="edu-mba"><div class="years">2008</div><div><h3>MBA, Finance</h3><p class="where">California State University, Los Angeles, USA</p></div></div>
     <div class="role"><div class="years">2006</div><div><h3>B.Tech, Electronics &amp; Instrumentation</h3><p class="where">UPTU, Greater Noida, India</p></div></div>
   </div>
 </main>
@@ -176,7 +206,7 @@
   const years = w => w.replace(/[A-Z][a-z]{2} /g, "").replace("Present", "now");
 
   document.getElementById("roles").innerHTML = roles.map((r, i) => `
-    <article class="role ${r.now ? "now open" : ""}">
+    <article class="role ${r.now ? "now open" : ""}" id="role-${i}">
       <div class="years">${years(r.when)}</div>
       <div>
         <h3>${r.company}</h3>
@@ -189,11 +219,50 @@
       </div>
     </article>`).join("");
 
+  const setOpen = (role, open) => {
+    role.classList.toggle("open", open);
+    const btn = role.querySelector(".toggle");
+    if (btn) btn.textContent = open ? "Hide highlights" : "Show highlights";
+  };
   document.querySelectorAll(".toggle").forEach(btn => btn.onclick = () => {
     const role = btn.closest(".role");
-    role.classList.toggle("open");
-    btn.textContent = role.classList.contains("open") ? "Hide highlights" : "Show highlights";
+    setOpen(role, !role.classList.contains("open"));
   });
+
+  // The journey: country, continent, what happened there, and which role it links to.
+  const journey = [
+    ["India", "Asia", "Early career", "role-6"],
+    ["USA", "North America", "MBA", "edu-mba"],
+    ["India", "Asia", "Ford, Expedia", "role-5"],
+    ["Netherlands", "Europe", "Booking", "role-3"],
+    ["Spain", "Europe", "Glovo", "role-2"],
+    ["Germany", "Europe", "Nubank", "role-1"],
+    ["India", "Asia", "dunnhumby", "role-0"]
+  ];
+  document.getElementById("route").innerHTML = journey.map(([c, cont, what, id]) =>
+    `<button class="stop" data-id="${id}"><span class="pin"></span><span class="country">${c}</span><span class="cont">${cont}</span><span class="what">${what}</span></button>`).join("");
+  document.querySelectorAll(".stop").forEach(stop => stop.onclick = () => {
+    document.querySelectorAll(".stop").forEach(s => s.classList.toggle("on", s === stop));
+    const target = document.getElementById(stop.dataset.id);
+    theme = "All"; filters(); dim();
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (target.querySelector(".toggle")) setOpen(target, true);
+    target.classList.add("flash"); setTimeout(() => target.classList.remove("flash"), 1200);
+  });
+
+  // Theme filters fade out roles that don't match.
+  let theme = "All";
+  function filters() {
+    const themes = ["All", ...new Set(roles.flatMap(r => r.themes))];
+    document.getElementById("filters").innerHTML = themes.map(t =>
+      `<button class="chip ${t === theme ? "on" : ""}" data-t="${t}">${t}</button>`).join("");
+    document.querySelectorAll(".chip").forEach(c => c.onclick = () => { theme = c.dataset.t; filters(); dim(); });
+  }
+  function dim() {
+    document.querySelectorAll("#roles .role").forEach((el, i) =>
+      el.classList.toggle("dim", theme !== "All" && !roles[i].themes.includes(theme)));
+  }
+  filters();
 </script>
 </body>
 </html>
