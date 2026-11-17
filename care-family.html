@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Care App</title>
+<meta name="description" content="A prototype of the family side of a cancer care navigator: daily check-ins, medicines, the treatment journey and a chat with the navigator. Fictional data.">
+<meta name="color-scheme" content="light only">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=4">
+<style>
+  body { background: var(--surface); }
+  .nav-wrap { background: var(--bg); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 16px 64px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 56px; align-items: start; }
+  .explain { position: sticky; top: 32px; padding-top: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: .08em; }
+  .explain h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.05; letter-spacing: -0.04em; margin: 12px 0 14px; }
+  .explain p { color: var(--muted); font-size: 17px; margin: 0; max-width: 480px; }
+  .steps { margin: 28px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; max-width: 480px; }
+  .steps li { display: flex; gap: 12px; font-size: 15px; }
+  .steps li span { width: 26px; height: 26px; border-radius: 50%; background: var(--brand-tint); color: var(--brand); font-weight: 800; font-size: 13px; display: grid; place-items: center; flex: none; }
+  .explain .btn { margin-top: 28px; }
+  .fine { font-size: 13px !important; margin-top: 18px !important; }
+
+  /* Phone */
+  .phone { background: var(--bg); border-radius: 44px; border: 10px solid #17121D; height: 820px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 80px rgba(40, 0, 70, .18); position: relative; }
+  .screen { flex: 1; overflow-y: auto; overflow-x: hidden; }
+  .tabbar { display: flex; border-top: 1px solid var(--line); background: var(--bg); padding: 6px 4px 12px; }
+  .tb { flex: 1; font: inherit; font-size: 11px; font-weight: 700; color: var(--muted); background: none; border: 0; padding: 8px 0 2px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; position: relative; }
+  .tb svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .tb.on { color: var(--brand); }
+  .tb .dot { position: absolute; top: 6px; right: calc(50% - 16px); width: 8px; height: 8px; border-radius: 50%; background: #D92D20; }
+
+  /* Screens */
+  .hello { background: #820AD1; color: #fff; padding: 22px 20px 22px; }
+  .hello .top { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+  .hello .top button { font: inherit; font-size: 13px; font-weight: 700; color: #fff; background: rgba(255, 255, 255, .16); border: 0; border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .hello h2 { font-size: 30px; margin: 14px 0 18px; letter-spacing: -0.03em; line-height: 1.1; }
+  .appt { background: #fff; color: var(--ink); border-radius: 20px; padding: 16px 18px; }
+  .label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .appt b { display: block; font-size: 17px; margin-top: 4px; }
+  .appt small { color: var(--muted); font-size: 13px; }
+  .s-body { padding: 20px 18px 28px; }
+  .s-title { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; margin: 0; line-height: 1.15; }
+  .s-sub { color: var(--muted); margin: 6px 0 0; font-size: 15px; }
+  .sec { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 24px 0 2px; }
+
+  .todo { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface); border-radius: 18px; margin-top: 10px; width: 100%; border: 0; font: inherit; text-align: left; cursor: pointer; color: inherit; }
+  .todo .ic { width: 38px; height: 38px; border-radius: 12px; background: var(--bg); display: grid; place-items: center; color: var(--brand); flex: none; font-weight: 800; }
+  .todo .ic svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .todo.done .ic { background: var(--brand); color: #fff; }
+  .todo b { display: block; font-size: 15px; }
+  .todo small { display: block; color: var(--muted); font-size: 13px; }
+  .todo .chev { margin-left: auto; color: var(--muted); font-size: 20px; }
+  .todo input { accent-color: var(--brand); width: 20px; height: 20px; margin-left: auto; flex: none; }
+  .todo.done.task b { text-decoration: line-through; color: var(--muted); }
+
+  .urgent { background: #FDECEC; color: #7A1A12; border-radius: 20px; padding: 16px 18px; margin-bottom: 4px; }
+  .urgent b { display: block; font-size: 16px; color: #B42318; }
+  .urgent p { margin: 4px 0 0; font-size: 14px; }
+  .calm { background: var(--brand-tint); border-radius: 20px; padding: 18px; }
+  .calm b { display: block; font-size: 17px; }
+  .calm p { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
+  .big-btn { width: 100%; justify-content: center; margin-top: 12px; }
+  .btn-red { background: #D92D20; color: #fff; }
+  .btn[disabled] { opacity: .4; cursor: default; transform: none; }
+
+  .q { margin-top: 24px; }
+  .q h4 { margin: 0 0 10px; font-size: 16px; }
+  .choice { display: flex; gap: 8px; }
+  .choice button { flex: 1; font: inherit; font-weight: 700; font-size: 15px; padding: 14px 8px; border-radius: 16px; border: 1.5px solid var(--line); background: var(--bg); cursor: pointer; color: var(--ink); }
+  .choice button.on { border-color: var(--brand); background: var(--brand-tint); color: var(--brand); }
+  .choice button.on.red { border-color: #D92D20; background: #FDECEC; color: #B42318; }
+  .hint-red { margin-top: 10px; font-size: 14px; color: #B42318; font-weight: 600; }
+  .slider-val { display: flex; justify-content: space-between; align-items: baseline; }
+  .slider-val b { font-size: 26px; letter-spacing: -0.02em; }
+  .slider-val span { color: var(--muted); font-weight: 700; font-size: 14px; }
+  .q input[type=range] { width: 100%; accent-color: var(--brand); height: 30px; }
+  .scale { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  textarea.note { width: 100%; font: inherit; font-size: 15px; border: 1.5px solid var(--line); border-radius: 16px; padding: 12px 14px; min-height: 84px; resize: vertical; }
+  textarea.note:focus { outline: none; border-color: var(--brand); }
+
+  .card { background: var(--surface); border-radius: 20px; padding: 16px 18px; margin-top: 12px; }
+  .card h3 { margin: 0; font-size: 17px; }
+  .card p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+  .dots { display: flex; gap: 6px; margin-top: 14px; }
+  .dots span { flex: 1; text-align: center; font-size: 11px; color: var(--muted); font-weight: 600; }
+  .dots i { display: block; height: 28px; border-radius: 8px; background: var(--line); margin-bottom: 4px; }
+  .dots i.t { background: var(--brand); }
+  .dots i.m { background: #F4B8B2; }
+  .low { color: #B42318; font-weight: 700; }
+
+  .progress { height: 8px; border-radius: 8px; background: rgba(130, 10, 209, .15); overflow: hidden; margin-top: 10px; }
+  .progress div { height: 100%; background: var(--brand); border-radius: 8px; }
+  .jl { display: grid; grid-template-columns: 58px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .jl:last-child { border-bottom: 0; }
+  .jl .d { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .jl b { display: block; font-size: 15px; }
+  .jl p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+  .jl.next .d, .jl.next b { color: var(--brand); }
+
+  .chat-screen { display: flex; flex-direction: column; height: 100%; }
+  .chat-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-weight: 800; flex: none; }
+  .chat-head b { display: block; font-size: 16px; }
+  .chat-head small { color: var(--muted); font-size: 12px; }
+  .thread { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 16px 14px; }
+  .bubble { max-width: 82%; padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.45; }
+  .bubble.me { align-self: flex-end; background: var(--brand); color: #fff; border-top-right-radius: 4px; }
+  .bubble.them { align-self: flex-start; background: var(--surface); border-top-left-radius: 4px; }
+  .bubble small { display: block; font-size: 11px; opacity: .7; margin-top: 4px; }
+  .composer { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--bg); }
+  .composer input { flex: 1; font: inherit; font-size: 15px; border: 1.5px solid var(--line); border-radius: 999px; padding: 11px 16px; min-width: 0; }
+  .composer input:focus { outline: none; border-color: var(--brand); }
+  .composer button { flex: none; }
+
+  .pick { padding: 32px 20px; }
+  .pick .todo { padding: 16px; }
+  .pill-s { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 10px; background: var(--bg); color: var(--muted); white-space: nowrap; }
+  .pill-s.ok { background: var(--brand-tint); color: var(--brand); }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .bar { height: 8px; border-radius: 8px; background: var(--line); overflow: hidden; margin-top: 6px; }
+  .bar div { height: 100%; background: var(--brand); }
+  .back { font: inherit; font-size: 14px; font-weight: 700; color: var(--brand); background: none; border: 0; padding: 0; cursor: pointer; margin-bottom: 14px; }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 999px; font-size: 14px; font-weight: 600; opacity: 0; transition: .2s; pointer-events: none; z-index: 20; max-width: calc(100vw - 32px); text-align: center; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 860px) {
+    body { background: var(--bg); }
+    .wrap { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 0; }
+    .explain { position: static; padding: 16px 16px 8px; }
+    .explain h1 { font-size: 26px; margin: 8px 0 6px; }
+    .explain p { font-size: 14px; }
+    .steps, .explain .btn, .fine { display: none !important; }
+    .phone { border: 0; border-radius: 0; height: auto; min-height: calc(100vh - 140px); box-shadow: none; overflow: visible; }
+    .screen { overflow: visible; }
+    .tabbar { position: sticky; bottom: 0; z-index: 5; }
+    .chat-screen { height: calc(100vh - 150px); }
+    .toast { bottom: 90px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-wrap">
+  <nav class="nav">
+    <a class="logo" href="index.html"><span class="mark">B</span>The Build Log</a>
+    <div class="nav-links">
+      <a href="care-navigator.html">Staff console</a>
+      <a href="care-journey.html">The story</a>
+    </div>
+  </nav>
+</div>
+
+<div class="wrap">
+  <section class="explain">
+    <div class="eyebrow">Family app &middot; prototype</div>
+    <h1>The navigator, in the family's pocket.</h1>
+    <p>What a caregiver sees: today's check-in, medicines, what's coming next, and one person to message. Everything here flows straight into the staff console.</p>
+    <ol class="steps">
+      <li><span>1</span>Pick a family and do today's check-in. Try saying yes to fever.</li>
+      <li><span>2</span>Open the staff console in another tab. The alert and message are already there.</li>
+      <li><span>3</span>Reply as Asha from the console's Messages tab, and watch it arrive here.</li>
+    </ol>
+    <a class="btn btn-brand" href="care-navigator.html" target="_blank" rel="noopener">Open the staff console &nearr;</a>
+    <p class="fine">Fictional families, not medical advice. Data is saved only in this browser, so please don't enter real patient details.</p>
+  </section>
+
+  <div class="phone">
+    <div class="screen" id="screen"></div>
+    <nav class="tabbar" id="tabbar"></nav>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="care-data.js?v=1"></script>
+<script>
+  const FAM_KEY = "buildlog-family-id";
+  let famId = null;
+  try { famId = localStorage.getItem(FAM_KEY); } catch (e) {}
+  let screen = famId && P(famId) ? "home" : "pick";
+  let ck = null, ckResult = null;
+
+  const first = s => String(s || "there").split(" ")[0];
+  const ICON = {
+    home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+    checkin: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 13l2 2 4-4"/>',
+    meds: '<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l5 5"/>',
+    journey: '<circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6"/>',
+    chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+    check: '<path d="M5 12l5 5 9-10"/>',
+    money: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'
+  };
+  const svg = k => `<svg viewBox="0 0 24 24">${ICON[k]}</svg>`;
+
+  function toast(t) { const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2800); }
+  function setFam(id) { famId = id; try { id ? localStorage.setItem(FAM_KEY, id) : localStorage.removeItem(FAM_KEY); } catch (e) {} }
+  function go(s) {
+    screen = s;
+    if (s === "checkin") { ckResult = null; ck = draft(P(famId)); }
+    draw();
+    $("screen").scrollTop = 0;
+    if (innerWidth <= 860) scrollTo({ top: 0 });
+  }
+  function draft(p) {
+    const c = p.checkins.find(x => x.date === TODAY);
+    return c ? { ...c, again: true } : { fever: null, pain: 2, fatigue: 3, appetite: "Good", doses: null, note: "" };
+  }
+  const painWord = v => v === 0 ? "None" : v <= 3 ? "Mild" : v <= 6 ? "Moderate" : "Severe";
+  const tiredWord = v => v === 0 ? "Not tired" : v <= 3 ? "A little" : v <= 6 ? "Quite tired" : "Exhausted";
+
+  // ---------- Screens ----------
+  const screens = {
+    pick() {
+      return `<div class="pick">
+        <p class="label">Demo</p>
+        <h2 class="s-title" style="margin-top:6px">Who's using the app?</h2>
+        <p class="s-sub">Each family sees only their own care.</p>
+        ${db.patients.map(p => `<button class="todo" data-act="pick" data-id="${p.id}">
+          <span class="ic">${esc(first(p.caregiver || p.name)[0] || "?")}</span>
+          <span><b>${esc(first(p.caregiver || p.name))}</b><small>Caring for ${esc(p.name)} &middot; ${esc(p.city)}</small></span><span class="chev">›</span></button>`).join("")}
+      </div>`;
+    },
+
+    home(p) {
+      const l = latest(p), checkedIn = l && l.date === TODAY;
+      const feverRecent = l && l.fever && diff(l.date) >= -2;
+      const meds = p.meds, takenCount = meds.filter(m => m.taken[TODAY]).length;
+      const famTasks = p.tasks.filter(t => t.owner === "Family" && !t.done).sort((a, b) => (a.due || "9") < (b.due || "9") ? -1 : 1);
+      const lastMsg = p.messages[p.messages.length - 1];
+      const total = p.costs.reduce((n, c) => n + Number(c.amount || 0), 0);
+      const approved = p.schemes.filter(s => s.status === "Approved").length, pending = p.schemes.filter(s => ["Checking", "Applied"].includes(s.status)).length;
+      return `
+        <header class="hello">
+          <div class="top"><span>Caring for ${esc(p.name)}</span><button data-act="switch">Switch</button></div>
+          <h2>Hi ${esc(first(p.caregiver))}</h2>
+          <div class="appt"><span class="label">Coming up</span>
+            ${p.nextAppt && p.nextAppt.date ? `<b>${esc(p.nextAppt.what)}</b><small>${fmtLong(p.nextAppt.date)} &middot; ${rel(p.nextAppt.date)} &middot; ${esc(p.hospital)}</small>` : `<b>Nothing booked yet</b><small>Asha will let you know</small>`}
+          </div>
+        </header>
+        <div class="s-body">
+          ${feverRecent ? `<div class="urgent"><b>Fever reported ${rel(l.date)}</b><p>If ${esc(first(p.name))} still has a fever, call the oncology line now, day or night.</p>
+            <button class="btn btn-red btn-sm big-btn" data-act="call">Call the oncology line</button></div>` : ""}
+          <div class="sec">Today</div>
+          <button class="todo ${checkedIn ? "done" : ""}" data-act="go" data-s="checkin">
+            <span class="ic">${svg(checkedIn ? "check" : "checkin")}</span>
+            <span><b>${checkedIn ? "Check-in done" : "Daily check-in"}</b><small>${checkedIn ? "Thank you. Asha has it." : "How is " + esc(first(p.name)) + " today? Takes 30 seconds."}</small></span><span class="chev">›</span></button>
+          ${meds.length ? `<button class="todo ${takenCount === meds.length ? "done" : ""}" data-act="go" data-s="meds">
+            <span class="ic">${svg(takenCount === meds.length ? "check" : "meds")}</span>
+            <span><b>Medicines</b><small>${takenCount} of ${meds.length} taken today</small></span><span class="chev">›</span></button>` : ""}
+          ${famTasks.map(t => `<label class="todo task">
+            <span class="ic">!</span><span><b>${esc(t.text)}</b><small>${t.due ? (diff(t.due) < 0 ? `<span class="low">Overdue, ${fmt(t.due)}</span>` : "Due " + rel(t.due)) : "From Asha"}</small></span>
+            <input type="checkbox" data-act="task" data-tid="${t.id}"></label>`).join("")}
+
+          <div class="sec">Your navigator</div>
+          <button class="todo" data-act="go" data-s="chat">
+            <span class="avatar">A</span>
+            <span style="min-width:0"><b>Asha</b><small style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lastMsg ? (lastMsg.from === "fam" ? "You: " : "") + esc(lastMsg.text) : "Say hello"}</small></span><span class="chev">›</span></button>
+
+          <div class="sec">Money and schemes</div>
+          <button class="todo" data-act="go" data-s="money">
+            <span class="ic">${svg("money")}</span>
+            <span><b>${rupees(total)} spent so far</b><small>${plural(approved, "scheme")} approved${pending ? ", " + pending + " in progress" : ""}</small></span><span class="chev">›</span></button>
+        </div>`;
+    },
+
+    checkin(p) {
+      if (ckResult) {
+        const name = first(p.name);
+        const body = ckResult === "fever"
+          ? `<div class="urgent"><b>Call the oncology line now</b><p>A fever during cancer treatment can be serious. Please don't wait to see if it passes.</p>
+              <button class="btn btn-red big-btn" data-act="call">Call the oncology line</button></div>
+             <p class="s-sub" style="margin-top:16px">Asha has been alerted and will call you as well.</p>`
+          : ckResult === "pain"
+          ? `<div class="calm"><b>Asha will call you today</b><p>Pain of 7 or more needs attention. Asha has been alerted and will speak to the care team.</p></div>`
+          : `<div class="calm"><b>Thank you, ${esc(first(p.caregiver))}</b><p>That's today's check-in done for ${esc(name)}. Asha will look at it today.</p></div>`;
+        return `<div class="s-body"><h2 class="s-title">Check-in sent</h2><div style="margin-top:18px">${body}</div>
+          <button class="btn btn-soft big-btn" data-act="go" data-s="home">Back to home</button></div>`;
+      }
+      const yn = (k, a, b, red) => `<div class="choice">
+        <button class="${ck[k] === false ? "on" : ""}" data-act="set" data-k="${k}" data-v="0">${a}</button>
+        <button class="${ck[k] === true ? "on" + (red ? " red" : "") : ""}" data-act="set" data-k="${k}" data-v="1">${b}</button></div>`;
+      const ready = ck.fever !== null && ck.doses !== null;
+      return `<div class="s-body">
+        <h2 class="s-title">How is ${esc(first(p.name))} today?</h2>
+        <p class="s-sub">${ck.again ? "You've already checked in today. Sending again updates it." : "Your answers go straight to Asha."}</p>
+        <div class="q"><h4>Any fever today?</h4>${yn("fever", "No", "Yes", true)}
+          ${ck.fever ? `<div class="hint-red">A temperature of 38°C or more needs an urgent call to the oncology line.</div>` : ""}</div>
+        <div class="q"><div class="slider-val"><h4>Pain</h4><span><b id="painV">${ck.pain}</b> <span id="painW">${painWord(ck.pain)}</span></span></div>
+          <input type="range" min="0" max="10" value="${ck.pain}" data-act="slide" data-k="pain"><div class="scale"><span>No pain</span><span>Worst</span></div></div>
+        <div class="q"><div class="slider-val"><h4>Tiredness</h4><span><b id="fatigueV">${ck.fatigue}</b> <span id="fatigueW">${tiredWord(ck.fatigue)}</span></span></div>
+          <input type="range" min="0" max="10" value="${ck.fatigue}" data-act="slide" data-k="fatigue"><div class="scale"><span>Full of energy</span><span>Exhausted</span></div></div>
+        <div class="q"><h4>Appetite</h4><div class="choice">${["Good", "Okay", "Poor"].map(o => `<button class="${ck.appetite === o ? "on" : ""}" data-act="appetite" data-v="${o}">${o}</button>`).join("")}</div></div>
+        <div class="q"><h4>Medicines taken today?</h4>${yn("doses", "Not yet", "Yes")}</div>
+        <div class="q"><h4>Anything else Asha should know?</h4><textarea class="note" data-act="note" placeholder="Optional">${esc(ck.note)}</textarea></div>
+        <button class="btn btn-brand big-btn" data-act="submit" ${ready ? "" : "disabled"}>Send to Asha</button>
+        ${ready ? "" : `<p class="s-sub" style="text-align:center;font-size:13px">Answer fever and medicines to send.</p>`}
+      </div>`;
+    },
+
+    meds(p) {
+      return `<div class="s-body"><h2 class="s-title">Medicines</h2><p class="s-sub">Tap when today's doses are taken. Asha sees it straight away.</p>
+        ${p.meds.map(m => {
+          const done = !!m.taken[TODAY], d = daysLeft(m);
+          const requested = p.tasks.some(t => !t.done && t.text === "Refill requested by family: " + m.name);
+          const week = Array.from({ length: 7 }, (_, k) => {
+            const i = 6 - k, day = off(-i);
+            const cls = m.taken[day] ? "t" : (i > 0 && day >= m.since ? "m" : "");
+            return `<span><i class="${cls}"></i>${i === 0 ? "Today" : toDate(day).toLocaleDateString("en-IN", { weekday: "short" })}</span>`;
+          }).join("");
+          return `<div class="card"><h3>${esc(m.name)}</h3><p>${esc(m.dose)} &middot; ${esc(m.schedule)}</p>
+            <button class="btn ${done ? "btn-soft" : "btn-brand"} big-btn" data-act="take" data-mid="${m.id}">${done ? "Taken today ✓ (tap to undo)" : "I've taken today's doses"}</button>
+            <div class="dots">${week}</div>
+            <p style="margin-top:12px">${d <= 7 ? `<span class="low">Running low: about ${plural(d, "day")} left</span>` : `About ${plural(d, "day")} of tablets left`}</p>
+            ${d <= 10 ? `<button class="btn btn-soft btn-sm big-btn" data-act="refill" data-mid="${m.id}" ${requested ? "disabled" : ""}>${requested ? "Refill requested ✓" : "Ask Asha to arrange a refill"}</button>` : ""}
+          </div>`;
+        }).join("") || `<div class="card"><p>No medicines added yet. Asha will add them for you.</p></div>`}
+      </div>`;
+    },
+
+    journey(p) {
+      const m = /cycle (\d+) of (\d+)/i.exec(p.phase || "");
+      const events = [...p.events].sort((a, b) => a.date < b.date ? 1 : -1);
+      return `<div class="s-body"><h2 class="s-title">${esc(first(p.name))}'s journey</h2>
+        <div class="card" style="background:var(--brand-tint)"><span class="label">Where we are</span><h3 style="margin-top:4px">${esc(p.phase)}</h3>
+          ${m ? `<div class="progress"><div style="width:${Math.min(100, m[1] * 100 / m[2])}%"></div></div><p>${m[2] - m[1] === 0 ? "Last cycle" : plural(m[2] - m[1], "cycle") + " to go"}</p>` : ""}</div>
+        <div class="sec">Timeline</div>
+        ${p.nextAppt && p.nextAppt.date ? `<div class="jl next"><div class="d">${fmt(p.nextAppt.date)}</div><div><b>${esc(p.nextAppt.what)}</b><p>Coming up ${rel(p.nextAppt.date)}</p></div></div>` : ""}
+        ${events.map(e => `<div class="jl"><div class="d">${fmt(e.date)}</div><div><b>${esc(e.title)}</b>${e.note ? `<p>${esc(e.note)}</p>` : ""}</div></div>`).join("")}
+      </div>`;
+    },
+
+    chat(p) {
+      return `<div class="chat-screen">
+        <div class="chat-head"><span class="avatar">A</span><div><b>Asha, care navigator</b><small>Usually replies within the hour</small></div></div>
+        <div class="thread" id="thread">${p.messages.map(m => `<div class="bubble ${m.from === "fam" ? "me" : "them"}">${esc(m.text)}
+          <small>${m.from === "fam" ? "You" : "Asha" + (m.auto ? " · automatic" : "")} · ${msgTime(m.at)}</small></div>`).join("") || `<p class="s-sub" style="text-align:center">Say hello to Asha.</p>`}</div>
+        <form class="composer" data-form="send"><input name="text" placeholder="Message Asha" autocomplete="off" required><button class="btn btn-brand btn-sm" type="submit">Send</button></form>
+      </div>`;
+    },
+
+    money(p) {
+      const total = p.costs.reduce((n, c) => n + Number(c.amount || 0), 0);
+      const by = PAYERS.map(k => [k, p.costs.filter(c => c.payer === k).reduce((n, c) => n + Number(c.amount || 0), 0)]).filter(x => x[1]);
+      return `<div class="s-body"><button class="back" data-act="go" data-s="home">‹ Home</button>
+        <h2 class="s-title">Money and schemes</h2><p class="s-sub">Every bill in one place. Asha handles scheme paperwork.</p>
+        <div class="card"><span class="label">Spent so far</span><h3 style="font-size:28px;margin-top:4px">${rupees(total)}</h3>
+          ${by.map(([k, v]) => `<div style="margin-top:12px;font-size:14px;display:flex;justify-content:space-between"><span>Paid by ${k.toLowerCase()}</span><b>${rupees(v)}</b></div><div class="bar"><div style="width:${total ? v * 100 / total : 0}%"></div></div>`).join("")}</div>
+        <div class="sec">Schemes and support</div>
+        <div class="card">${p.schemes.map(s => `<div class="row"><span style="font-size:15px">${esc(s.name)}</span><span class="pill-s ${s.status === "Approved" ? "ok" : ""}">${esc(s.status)}</span></div>`).join("") || `<p>Asha will check what you may be eligible for.</p>`}</div>
+        <div class="sec">Recent bills</div>
+        <div class="card">${[...p.costs].sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 6).map(c => `<div class="row"><span style="font-size:15px">${esc(c.item)}<br><small class="muted" style="color:var(--muted)">${fmt(c.date)} &middot; ${esc(c.payer)}</small></span><b>${rupees(c.amount)}</b></div>`).join("") || `<p>No bills yet.</p>`}</div>
+        <button class="btn btn-soft big-btn" data-act="go" data-s="chat">Ask Asha about costs</button>
+      </div>`;
+    }
+  };
+
+  const TABS = [["home", "Home"], ["checkin", "Check-in"], ["meds", "Medicines"], ["journey", "Journey"], ["chat", "Chat"]];
+  function drawTabs(p) {
+    if (screen === "pick" || !p) { $("tabbar").style.display = "none"; return; }
+    $("tabbar").style.display = "";
+    const last = p.messages[p.messages.length - 1];
+    const active = screen === "money" ? "home" : screen;
+    $("tabbar").innerHTML = TABS.map(([k, label]) => `<button class="tb ${k === active ? "on" : ""}" data-act="go" data-s="${k}">${svg(k)}${label}
+      ${k === "chat" && last && last.from === "nav" && !last.auto && screen !== "chat" ? '<span class="dot"></span>' : ""}</button>`).join("");
+  }
+
+  function draw() {
+    const p = P(famId);
+    if (!p && screen !== "pick") screen = "pick";
+    $("screen").innerHTML = screens[screen](p);
+    drawTabs(p);
+    save();
+    const t = document.getElementById("thread"); if (t) t.scrollTop = t.scrollHeight;
+  }
+
+  // ---------- Actions ----------
+  const actions = {
+    pick(el) { setFam(el.dataset.id); go("home"); },
+    switch() { setFam(null); go("pick"); },
+    go(el) { go(el.dataset.s); },
+    call() { toast("Demo: this would call the hospital's 24-hour oncology line."); },
+    set(el) { ck[el.dataset.k] = el.dataset.v === "1"; draw(); },
+    appetite(el) { ck.appetite = el.dataset.v; draw(); },
+    submit() {
+      const p = P(famId);
+      const c = { date: TODAY, fever: ck.fever, pain: ck.pain, fatigue: ck.fatigue, appetite: ck.appetite, doses: ck.doses, note: (ck.note || "").trim() };
+      p.checkins = p.checkins.filter(x => x.date !== TODAY).concat(c);
+      if (c.doses) p.meds.forEach(m => { if (!m.taken[TODAY]) { m.taken[TODAY] = true; m.left = Math.max(0, m.left - m.perDay); } });
+      let reply;
+      if (c.fever) {
+        p.events.push({ id: uid(), date: TODAY, type: "Alert", title: "Fever reported in the family app", note: c.note });
+        reply = "Fever noted. Please call the oncology line now, day or night. I've been alerted and will call you too.";
+        ckResult = "fever";
+      } else if (c.pain >= 7) {
+        p.events.push({ id: uid(), date: TODAY, type: "Alert", title: `High pain (${c.pain}/10) reported in the family app`, note: c.note });
+        reply = "Thank you for telling me. Pain of 7 or more needs attention, so I'll call you today.";
+        ckResult = "pain";
+      } else {
+        reply = "Check-in received, thank you. I'll look at it today.";
+        ckResult = "ok";
+      }
+      p.messages.push({ id: uid(), from: "nav", text: reply, at: stamp(), auto: true });
+      draw(); $("screen").scrollTop = 0; if (innerWidth <= 860) scrollTo({ top: 0 });
+    },
+    take(el) {
+      const m = P(famId).meds.find(x => x.id === el.dataset.mid);
+      if (m.taken[TODAY]) { delete m.taken[TODAY]; m.left += m.perDay; toast("Undone"); }
+      else { m.taken[TODAY] = true; m.left = Math.max(0, m.left - m.perDay); toast("Marked as taken. Asha can see it."); }
+      draw();
+    },
+    refill(el) {
+      const p = P(famId), m = p.meds.find(x => x.id === el.dataset.mid);
+      p.tasks.push({ id: uid(), text: "Refill requested by family: " + m.name, owner: "Navigator", due: TODAY, done: false });
+      p.messages.push({ id: uid(), from: "fam", text: `Please arrange a refill of ${m.name}. We have about ${plural(daysLeft(m), "day")} left.`, at: stamp() });
+      draw(); toast("Asha has your refill request");
+    }
+  };
+
+  document.addEventListener("click", e => {
+    const el = e.target.closest("[data-act]");
+    if (!el || el.disabled || el.type === "checkbox" || el.type === "range" || el.tagName === "TEXTAREA") return;
+    const fn = actions[el.dataset.act]; if (fn) fn(el);
+  });
+  document.addEventListener("input", e => {
+    const el = e.target;
+    if (el.dataset.act === "slide") {
+      const k = el.dataset.k, v = Number(el.value); ck[k] = v;
+      $(k + "V").textContent = v; $(k + "W").textContent = k === "pain" ? painWord(v) : tiredWord(v);
+    }
+    if (el.dataset.act === "note") ck.note = el.value;
+  });
+  document.addEventListener("change", e => {
+    const el = e.target;
+    if (el.dataset.act === "task") {
+      const t = P(famId).tasks.find(x => x.id === el.dataset.tid);
+      t.done = true; toast("Done. Asha can see it."); draw();
+    }
+  });
+  document.addEventListener("submit", e => {
+    if (e.target.dataset.form !== "send") return;
+    e.preventDefault();
+    const text = new FormData(e.target).get("text").trim();
+    if (!text) return;
+    P(famId).messages.push({ id: uid(), from: "fam", text, at: stamp() });
+    draw();
+    const input = document.querySelector(".composer input"); if (input) input.focus();
+  });
+
+  // Pick up replies and changes made in the staff console (another tab), unless mid check-in.
+  onSync(() => { if (!(screen === "checkin" && !ckResult)) draw(); });
+
+  draw();
+</script>
+</body>
+</html>
